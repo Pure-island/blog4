@@ -15,6 +15,7 @@ deploy:
     - rsync -arv --delete ./blog4 ~
     - cd ~/blog4
     - bundle install
+    - yarn install --check-files
     - rails db:migrate
     - nohup rails server -d -b 0.0.0.0 -p 4000 &
   only:
