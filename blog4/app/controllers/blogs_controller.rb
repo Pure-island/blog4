@@ -1,5 +1,6 @@
 class BlogsController < ApplicationController
   before_action :set_blog, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate, except: [:index, :show]
 
 
   # GET /blogs
@@ -25,7 +26,9 @@ class BlogsController < ApplicationController
   # POST /blogs
   # POST /blogs.json
   def create
+    @user = User.find(session[:current_userid])
     @blog = Blog.new(blog_params)
+    @blog.user = @user
 
     respond_to do |format|
       if @blog.save
@@ -63,13 +66,18 @@ class BlogsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_blog
-      @blog = Blog.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def blog_params
-      params.require(:blog).permit(:title, :content)
-    end
+  def authenticate
+    redirect_to login_users_url, alert: 'Must login!' unless current_user
+  end
+
+  # Use callbacks to share common setup or constraints between actions.
+  def set_blog
+    @blog = Blog.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def blog_params
+    params.require(:blog).permit(:title, :content)
+  end
 end
